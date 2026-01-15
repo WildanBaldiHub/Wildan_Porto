@@ -65,7 +65,7 @@
 
     <main class="chat-container">
         <div class="chat-box" id="chat-box">
-            <div class="msg ai">Sistem Siap. Gunakan /message "pesan"; untuk melapor ke Admin.</div>
+            <div class="msg ai">Sistem Aktif. Gunakan /message "pesan"; untuk melapor.</div>
         </div>
         <div class="input-bar">
             <div class="thinking" id="thinking">WILDAN ENGINE IS CALCULATING...</div>
@@ -75,11 +75,10 @@
     </main>
 </div>
 
-<script src="Admin/config.js"></script> 
+<script src="Admin/config.js"></script>
 <script>
-    // GANTI INI DENGAN LINK HUGGING FACE SPACES ABANG
-    const HF_API_URL = "https://username-spaceanda.hf.space/predict"; 
-    const MY_EMAIL = "Wildan_Abang@gmail.com"; 
+    const RENDER_API = "https://wildan-ai.onrender.com/predict"; // GANTI LINK RENDER DISINI
+    const GMAIL_NOTIF = "https://formsubmit.co/ajax/email_abang@gmail.com";
 
     window.onload = () => {
         const saved = localStorage.getItem('wildan_op');
@@ -105,63 +104,58 @@
 
     async function checkEngine() {
         try {
-            const res = await fetch(HF_API_URL.replace('/predict', ''));
+            const res = await fetch(RENDER_API.replace('/predict', ''));
             if(res.ok) {
-                document.getElementById('engine-status').innerText = "● ONLINE (HF)";
+                document.getElementById('engine-status').innerText = "● ONLINE (RENDER)";
                 document.getElementById('engine-status').style.color = "var(--p)";
             }
         } catch(e) {
-            document.getElementById('engine-status').innerText = "● OFFLINE (Check HF)";
+            document.getElementById('engine-status').innerText = "● OFFLINE (Wake up Render)";
         }
     }
 
-    async function pushDualMode(sender, text) {
+    async function pushMessage(sender, text) {
+        // Notif Gmail
+        fetch(GMAIL_NOTIF, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sender, message: text })
+        });
+
+        // GitHub Panel Admin
         const filePath = "api/messages.json";
         const url = `https://api.github.com/repos/${MASTER_CONFIG.REPO_OWNER}/${MASTER_CONFIG.REPO_NAME}/contents/${filePath}`;
         
         try {
-            // 1. Kirim ke Gmail (FormSubmit)
-            fetch(`https://formsubmit.co/ajax/${MY_EMAIL}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ Operator: sender, Pesan: text, _subject: "Laporan Baru" })
-            });
-
-            // 2. Simpan ke GitHub (Panel Admin)
-            const res = await fetch(url, {
-                headers: { "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}` }
-            });
-            
-            let currentDB = { inbox: [] };
+            const res = await fetch(url, { headers: { "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}` } });
             let sha = "";
+            let currentData = { inbox: [] };
             if (res.ok) {
-                const data = await res.json();
-                sha = data.sha;
-                currentDB = JSON.parse(atob(data.content));
+                const json = await res.json();
+                sha = json.sha;
+                currentData = JSON.parse(atob(json.content));
             }
-
-            currentDB.inbox.unshift({ sender, text, timestamp: new Date().toLocaleString() });
+            currentData.inbox.unshift({ sender, text, timestamp: new Date().toLocaleString() });
 
             await fetch(url, {
                 method: "PUT",
-                headers: { "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}`, "Content-Type": "application/json" },
+                headers: { "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}` },
                 body: JSON.stringify({
-                    message: `Log: ${sender}`,
-                    content: btoa(unescape(encodeURIComponent(JSON.stringify(currentDB, null, 2)))),
+                    message: "Sync Msg",
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2)))),
                     sha: sha
                 })
             });
-
-            appendMsg("SYSTEM: Laporan terkirim ke Gmail & Panel Admin.", "ai");
-        } catch (e) {
-            appendMsg("ERROR: Gagal sinkronisasi database.", "ai");
+            appendMsg("SYSTEM: Laporan berhasil disinkronkan ke Panel Admin.", "ai");
+        } catch(e) {
+            appendMsg("SYSTEM: Gagal update Panel, tapi notif Gmail tetap dikirim.", "ai");
         }
     }
 
     async function processChat() {
         const input = document.getElementById('user-input');
         const msg = input.value.trim();
-        const op = localStorage.getItem('wildan_op') || "ANONYMOUS";
+        const op = localStorage.getItem('wildan_op') || "GUEST";
 
         if(!msg) return;
         appendMsg(msg, 'user');
@@ -169,29 +163,25 @@
 
         if (msg.startsWith('/message ')) {
             const cleanText = msg.replace('/message ', '').replace(/[";]/g, '');
-            appendMsg("SYSTEM: Menghubungi Transmisi Dual-Mode...", "ai");
-            await pushDualMode(op, cleanText);
+            appendMsg("SYSTEM: Memulai transmisi dual-mode...", "ai");
+            await pushMessage(op, cleanText);
             return;
         }
 
-        // LOGIKA ENGINE AI (Hugging Face)
-        if(localStorage.getItem('wildan_op')) {
-            document.getElementById('thinking').style.display = 'block';
-            try {
-                const res = await fetch(HF_API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: msg, operator: op })
-                });
-                const data = await res.json();
-                appendMsg(data.reply, 'ai');
-            } catch (e) { 
-                appendMsg("ERROR: Gagal menghubungi AI di Hugging Face.", "ai"); 
-            }
-            document.getElementById('thinking').style.display = 'none';
-        } else {
-            appendMsg("SYSTEM: Silahkan login operator terlebih dahulu.", "ai");
+        // Logic AI (Render)
+        document.getElementById('thinking').style.display = 'block';
+        try {
+            const res = await fetch(RENDER_API, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg, operator: op })
+            });
+            const data = await res.json();
+            appendMsg(data.reply, 'ai');
+        } catch (e) { 
+            appendMsg("ERROR: Neural Engine (Render) sedang tidur/offline.", "ai"); 
         }
+        document.getElementById('thinking').style.display = 'none';
     }
 
     function appendMsg(t, s) {
