@@ -1,6 +1,6 @@
 {
   "config": {
-    "engine_active": true,
+    "engine_active": false,
     "announcement": "WILDAN Engine V1.0 Online // System Stable",
     "maintenance_msg": "Maaf, Engine sedang dalam maintenance rutin."
   },
