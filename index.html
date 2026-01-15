@@ -10,7 +10,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS ASLI TANPA PERUBAHAN */
+        /* CSS ASLI TANPA PERUBAHAN SEDIKITPUN */
         :root {
             --bg: #020617;
             --p: #00ff88;
@@ -77,15 +77,8 @@
         }
 
         @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
         .nav-links a {
@@ -118,13 +111,8 @@
         }
 
         @keyframes scroll {
-            from {
-                transform: translateX(100%);
-            }
-
-            to {
-                transform: translateX(-100%);
-            }
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
         }
 
         .hero {
@@ -207,7 +195,6 @@
             background: rgba(0, 255, 136, 0.1);
         }
 
-        /* FITUR MODAL & BUTTONS (Hanya Tambahan) */
         .modal {
             position: fixed;
             top: 0;
@@ -268,9 +255,7 @@
         }
 
         @media (max-width: 768px) {
-            .modal-content {
-                grid-template-columns: 1fr;
-            }
+            .modal-content { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -285,8 +270,7 @@
     </div>
 
     <nav class="container">
-        <a href="index.html" class="logo">WILDAN<span style="color:var(--p)">_LABS</span><span
-                class="cursor">.</span></a>
+        <a href="index.html" class="logo">WILDAN<span style="color:var(--p)">_LABS</span><span class="cursor">.</span></a>
         <div class="nav-links">
             <a href="index.html" style="color:var(--p)">HOME</a>
             <a href="projects.html">ARCHIVE</a>
@@ -299,87 +283,67 @@
         <section class="hero">
             <p style="font-family:'JetBrains Mono'; color:var(--p)">// INITIALIZING_INTERFACE_v1.0</p>
             <h1>Creative<br><span>Engineering</span>.</h1>
-            <p style="color: #94a3b8; max-width: 650px; margin: 0 auto 30px; font-size: 1.2rem;">Achmad Wildan —
-                Memberikan solusi digital melalui riset pemrograman, manajemen database, dan pengembangan game
-                interaktif.</p>
-            <a href="projects.html" class="btn-main"
-                style="background: var(--p); color: #000; padding: 20px 45px; border-radius: 15px; font-weight: 800; text-decoration: none; display: inline-block;">DECRYPT_PROJECTS</a>
+            <p style="color: #94a3b8; max-width: 650px; margin: 0 auto 30px; font-size: 1.2rem;">Achmad Wildan — Memberikan solusi digital melalui riset pemrograman, manajemen database, dan pengembangan game interaktif.</p>
+            <a href="projects.html" class="btn-main" style="background: var(--p); color: #000; padding: 20px 45px; border-radius: 15px; font-weight: 800; text-decoration: none; display: inline-block;">DECRYPT_PROJECTS</a>
 
             <div class="dash-grid">
-                <div class="dash-card">
-                    <h3>24/7</h3>
-                    <p>UPTIME_MONITOR</p>
-                </div>
-                <div class="dash-card">
-                    <h3>100%</h3>
-                    <p>DATA_SECURITY</p>
-                </div>
-                <div class="dash-card">
-                    <h3>18+</h3>
-                    <p>SYSTEMS_BUILT</p>
-                </div>
-                <div class="dash-card">
-                    <h3>0.2s</h3>
-                    <p>QUERY_SPEED</p>
-                </div>
+                <div class="dash-card"><h3>24/7</h3><p>UPTIME_MONITOR</p></div>
+                <div class="dash-card"><h3>100%</h3><p>DATA_SECURITY</p></div>
+                <div class="dash-card"><h3>18+</h3><p>SYSTEMS_BUILT</p></div>
+                <div class="dash-card"><h3>0.2s</h3><p>QUERY_SPEED</p></div>
             </div>
         </section>
 
         <section style="margin-top: 100px;">
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
                 <h2 style="font-size: 3rem; letter-spacing: -2px;">Latest <span>Work</span></h2>
-                <a href="projects.html" style="color:var(--p); text-decoration:none; font-family:'JetBrains Mono';">[
-                    ALL_PROJECTS ]</a>
+                <a href="projects.html" style="color:var(--p); text-decoration:none; font-family:'JetBrains Mono';">[ ALL_PROJECTS ]</a>
             </div>
             <div id="topGrid" class="grid"></div>
         </section>
     </main>
 
     <footer style="padding: 60px 0; border-top: 1px solid rgba(0,255,136,0.1); margin-top: 100px;">
-        <div class="container"
-            style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; align-items: start;">
+        <div class="container" style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; align-items: start;">
             <div>
-                <h3 style="font-family: 'JetBrains Mono'; font-weight: 800; color: #fff; margin-bottom: 20px;">
-                    WILDAN<span style="color:var(--p)">_LABS</span></h3>
-                <p style="font-size: 0.85rem; color: #64748b; line-height: 1.6; max-width: 320px;">
-                    Eksperimen digital yang menggabungkan kecerdasan buatan, optimasi database, dan desain interaktif.
-                </p>
+                <h3 style="font-family: 'JetBrains Mono'; font-weight: 800; color: #fff; margin-bottom: 20px;">WILDAN<span style="color:var(--p)">_LABS</span></h3>
+                <p style="font-size: 0.85rem; color: #64748b; line-height: 1.6; max-width: 320px;">Eksperimen digital yang menggabungkan kecerdasan buatan, optimasi database, dan desain interaktif.</p>
             </div>
-
             <div>
-                <h4 style="font-family: 'JetBrains Mono'; color: var(--p); font-size: 0.8rem; margin-bottom: 15px;">//
-                    SYSTEM_DIAGNOSTICS</h4>
+                <h4 style="font-family: 'JetBrains Mono'; color: var(--p); font-size: 0.8rem; margin-bottom: 15px;">// SYSTEM_DIAGNOSTICS</h4>
                 <ul style="list-style: none; font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #94a3b8;">
                     <li style="margin-bottom: 8px;"><span style="color:var(--p)">●</span> ENGINE: v1.0.5_STABLE</li>
                     <li style="margin-bottom: 8px;"><span style="color:var(--p)">●</span> NODE: ID_WildanBaldi</li>
                     <li><span style="color:var(--p)">●</span> LATENCY: 24ms</li>
                 </ul>
             </div>
-
             <div style="text-align: right;">
-                <div
-                    style="display: flex; justify-content: flex-end; gap: 20px; margin-bottom: 25px; font-size: 1.2rem; color: #94a3b8;">
+                <div style="display: flex; justify-content: flex-end; gap: 20px; margin-bottom: 25px; font-size: 1.2rem; color: #94a3b8;">
                     <a href="#" style="color: inherit;"><i class="fab fa-github"></i></a>
                     <a href="#" style="color: inherit;"><i class="fab fa-instagram"></i></a>
                     <a href="#" style="color: inherit;"><i class="fab fa-linkedin"></i></a>
                 </div>
-                <p style="color: #fff; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px;">© 2026 WILDAN
-                    BALDI.</p>
-                <p
-                    style="color: var(--p); font-family: 'JetBrains Mono'; font-size: 0.7rem; margin-top: 5px; letter-spacing: 1px;">
-                    ALL RIGHTS RESERVED.</p>
+                <p style="color: #fff; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px;">© 2026 WILDAN BALDI.</p>
+                <p style="color: var(--p); font-family: 'JetBrains Mono'; font-size: 0.7rem; margin-top: 5px; letter-spacing: 1px;">ALL RIGHTS RESERVED.</p>
             </div>
         </div>
     </footer>
 
     <script>
         let dbProjects = [];
+
+        // --- SINKRONISASI DENGAN GITHUB ---
         async function syncMain() {
             try {
-                const res = await fetch('./api/database.json');
+                // Mengambil database langsung dari GitHub agar selalu up-to-date
+                const res = await fetch('https://raw.githubusercontent.com/WildanBaldiHub/Wildan_Porto/main/api/database.json?t=' + Date.now());
                 const data = await res.json();
                 dbProjects = data.projects;
+
+                // Update Announcement Marquee
                 document.getElementById('announcement-text').innerText = `${data.config.announcement} // `.repeat(6);
+
+                // Render Top 3 Projects ke Grid
                 document.getElementById('topGrid').innerHTML = dbProjects.slice(0, 3).map((p, index) => `
                     <div class="card">
                         <span class="status-badge">${p.status}</span>
@@ -392,9 +356,13 @@
                         </div>
                     </div>
                 `).join('');
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error("Sync Error:", e);
+                document.getElementById('announcement-text').innerText = "OFFLINE_MODE: Gagal memuat database dari sistem pusat.";
+            }
         }
 
+        // --- FUNGSI MODAL DETAIL ---
         function openDetail(i) {
             const p = dbProjects[i];
             document.getElementById('modalData').innerHTML = `
@@ -421,10 +389,14 @@
             `;
             document.getElementById('projectModal').style.display = 'flex';
         }
+
         function closeModal() { document.getElementById('projectModal').style.display = 'none'; }
+        
+        // Tutup modal jika klik di luar area konten
         window.onclick = (e) => { if (e.target.id === 'projectModal') closeModal(); }
+
+        // Jalankan sinkronisasi saat load
         syncMain();
     </script>
 </body>
-
 </html>

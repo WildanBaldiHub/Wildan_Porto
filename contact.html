@@ -75,6 +75,8 @@
     </main>
 </div>
 
+
+
 <script>
     let isOnline = false;
 
@@ -102,6 +104,7 @@
 
     async function checkEngine() {
         try {
+            // Cek AI Lokal
             const res = await fetch('http://127.0.0.1:5000/');
             isOnline = true;
             document.getElementById('engine-status').innerText = "● ONLINE";
@@ -121,23 +124,29 @@
         appendMsg(msg, 'user');
         input.value = '';
 
-        // LOGIKA KIRIM KE ADMIN
+        // --- LOGIKA KIRIM KE ADMIN PANEL (Hosting) ---
         if (msg.startsWith('/message ')) {
             const cleanText = msg.replace('/message ', '').replace(/[";]/g, '');
             try {
-                await fetch('./api/save_message.php', {
+                // Gunakan URL relatif atau absolut ke file PHP Abang di hosting
+                const res = await fetch('./api/save_message.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ sender: op, text: cleanText })
                 });
-                appendMsg("SYSTEM: Pesan berhasil dikirim ke Admin Panel.", "ai");
+                
+                if(res.ok) {
+                    appendMsg("SYSTEM: Pesan berhasil dikirim ke Admin Panel.", "ai");
+                } else {
+                    throw new Error();
+                }
             } catch(e) {
-                appendMsg("ERROR: Gagal terhubung ke API Hosting.", "ai");
+                appendMsg("ERROR: Gagal terhubung ke API Hosting. Pastikan save_message.php sudah ada.", "ai");
             }
             return;
         }
 
-        // LOGIKA ENGINE PTH
+        // --- LOGIKA ENGINE AI (Lokal) ---
         if(isOnline && localStorage.getItem('wildan_op')) {
             document.getElementById('thinking').style.display = 'block';
             try {
@@ -148,10 +157,14 @@
                 });
                 const data = await res.json();
                 appendMsg(data.reply, 'ai');
-            } catch (e) { appendMsg("ERROR: server.py mati.", "ai"); }
+            } catch (e) { 
+                appendMsg("ERROR: server.py mati tiba-tiba.", "ai"); 
+            }
             document.getElementById('thinking').style.display = 'none';
+        } else if (!localStorage.getItem('wildan_op')) {
+            appendMsg("SYSTEM: Silahkan login operator di sidebar terlebih dahulu.", "ai");
         } else {
-            appendMsg("SYSTEM: Silahkan login atau gunakan format /message \"text\";", "ai");
+            appendMsg("SYSTEM: Engine offline. Gunakan /message untuk bantuan manual.", "ai");
         }
     }
 
