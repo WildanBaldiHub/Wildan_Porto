@@ -26,7 +26,6 @@
         .msg.user { background: #1e293b; color: #fff; align-self: flex-end; }
         .input-bar { padding: 25px 35px; background: #0a1120; border-top: 1px solid var(--border); display: flex; gap: 12px; position: relative; }
         #user-input { flex: 1; background: #020617; border: 1px solid var(--border); padding: 14px; border-radius: 10px; color: #fff; outline: none; }
-        .thinking { position: absolute; top: -22px; left: 35px; font-size: 0.7rem; color: var(--p); font-family: 'JetBrains Mono'; display: none; }
     </style>
 </head>
 <body>
@@ -57,28 +56,22 @@
                 <button class="btn" style="background: #ff4757; color: white; margin-top: 15px;" onclick="logout()">TERMINATE</button>
             </div>
         </div>
-        <div class="auth-card" style="margin-top: auto;">
-            <h4>// ENGINE_STATUS</h4>
-            <p id="engine-status" style="font-size: 0.7rem; color: #ff4757;">● OFFLINE</p>
-        </div>
     </aside>
 
     <main class="chat-container">
         <div class="chat-box" id="chat-box">
-            <div class="msg ai">Sistem Siap. Gunakan /message "pesan"; untuk melapor ke Admin.</div>
+            <div class="msg ai">Sistem Aktif. Gunakan <b>/message "teks";</b> untuk kirim laporan.</div>
         </div>
         <div class="input-bar">
-            <div class="thinking" id="thinking">WILDAN ENGINE IS CALCULATING...</div>
-            <input type="text" id="user-input" placeholder="Tulis perintah..." onkeypress="if(event.key==='Enter') processChat()">
+            <input type="text" id="user-input" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') processChat()">
             <button class="btn" style="width: 100px;" onclick="processChat()">EXECUTE</button>
         </div>
     </main>
 </div>
 
+<script src="Admin/config.js"></script>
 <script>
-    let isOnline = false;
-    // GANTI INI DENGAN EMAIL ABANG
-    const MY_EMAIL = "email_abang@gmail.com"; 
+    const MY_EMAIL = "wildanbaldifans2@gmail.com"; // <--- GANTI DENGAN GMAIL ABANG
 
     window.onload = () => {
         const saved = localStorage.getItem('wildan_op');
@@ -87,7 +80,6 @@
             document.getElementById('profile-display').style.display = 'block';
             document.getElementById('op-name').innerText = saved.toUpperCase();
         }
-        checkEngine();
     };
 
     function login() {
@@ -102,70 +94,62 @@
         location.reload();
     }
 
-    async function checkEngine() {
+    async function pushDualMode(sender, text) {
+        const filePath = "api/messages.json";
+        const url = `https://api.github.com/repos/${MASTER_CONFIG.REPO_OWNER}/${MASTER_CONFIG.REPO_NAME}/contents/${filePath}`;
+        
         try {
-            const res = await fetch('http://127.0.0.1:5000/');
-            isOnline = true;
-            document.getElementById('engine-status').innerText = "● ONLINE";
-            document.getElementById('engine-status').style.color = "var(--p)";
-        } catch(e) {
-            isOnline = false;
-            document.getElementById('engine-status').innerText = "● OFFLINE (Run server.py)";
-        }
-    }
-
-    // FUNGSI KIRIM INSTAN (TANPA TOKEN / TANPA PHP)
-    async function sendInstan(sender, text) {
-        try {
-            const res = await fetch(`https://formsubmit.co/ajax/${MY_EMAIL}`, {
+            // 1. KIRIM KE GMAIL (VIA FORMSUBMIT) - INSTAN!
+            fetch(`https://formsubmit.co/ajax/${MY_EMAIL}`, {
                 method: "POST",
-                headers: { 'Content-Type': 'application/json' },
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ Operator: sender, Pesan: text, _subject: "Laporan Baru WILDAN LABS" })
+            });
+
+            // 2. SIMPAN KE GITHUB (UNTUK PANEL ADMIN)
+            const res = await fetch(url, {
+                headers: { "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}` }
+            });
+            
+            let currentDB = { inbox: [] };
+            let sha = "";
+            if (res.ok) {
+                const data = await res.json();
+                sha = data.sha;
+                currentDB = JSON.parse(atob(data.content));
+            }
+
+            currentDB.inbox.unshift({ sender, text, timestamp: new Date().toLocaleString() });
+
+            await fetch(url, {
+                method: "PUT",
+                headers: { "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}`, "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    Operator: sender,
-                    Message: text,
-                    _subject: `New Report from ${sender}`
+                    message: `New message from ${sender}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(currentDB, null, 2)))),
+                    sha: sha
                 })
             });
-            if(res.ok) {
-                appendMsg("SYSTEM: PESAN TERKIRIM INSTAN! Cek email atau dashboard FormSubmit.", "ai");
-            } else { throw new Error(); }
+
+            appendMsg("SYSTEM: Laporan terkirim ke Gmail & Panel Admin.", "ai");
         } catch (e) {
-            appendMsg("ERROR: Gagal mengirim pesan. Pastikan internet stabil.", "ai");
+            appendMsg("ERROR: Gagal sinkronisasi data.", "ai");
         }
     }
 
     async function processChat() {
         const input = document.getElementById('user-input');
         const msg = input.value.trim();
-        const op = localStorage.getItem('wildan_op') || "ANONYMOUS";
+        const op = localStorage.getItem('wildan_op') || "GUEST";
 
         if(!msg) return;
         appendMsg(msg, 'user');
         input.value = '';
 
-        // LOGIKA BARU: KIRIM INSTAN
         if (msg.startsWith('/message ')) {
             const cleanText = msg.replace('/message ', '').replace(/[";]/g, '');
-            appendMsg("SYSTEM: Mengirim laporan...", "ai");
-            await sendInstan(op, cleanText);
-            return;
-        }
-
-        // LOGIKA ENGINE PTH
-        if(isOnline && localStorage.getItem('wildan_op')) {
-            document.getElementById('thinking').style.display = 'block';
-            try {
-                const res = await fetch("http://127.0.0.1:5000/predict", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: msg, operator: op })
-                });
-                const data = await res.json();
-                appendMsg(data.reply, 'ai');
-            } catch (e) { appendMsg("ERROR: server.py mati.", "ai"); }
-            document.getElementById('thinking').style.display = 'none';
-        } else {
-            appendMsg("SYSTEM: Silahkan login atau gunakan format /message \"text\";", "ai");
+            appendMsg("SYSTEM: Menghubungi Transmisi Dual-Mode...", "ai");
+            await pushDualMode(op, cleanText);
         }
     }
 
