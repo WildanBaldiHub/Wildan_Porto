@@ -129,7 +129,7 @@
             const cleanText = msg.replace('/message ', '').replace(/[";]/g, '');
             try {
                 // Gunakan URL relatif atau absolut ke file PHP Abang di hosting
-                const res = await fetch('./api/save_message.php', {
+                const response = await fetch('./api/save_message.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ sender: op, text: cleanText })
