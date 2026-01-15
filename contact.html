@@ -75,10 +75,10 @@
     </main>
 </div>
 
-<script src="Admin/config.js"></script>
 <script>
     let isOnline = false;
-    const MSG_PATH = "api/messages.json"; // Path file database pesan
+    // GANTI INI DENGAN EMAIL ABANG
+    const MY_EMAIL = "email_abang@gmail.com"; 
 
     window.onload = () => {
         const saved = localStorage.getItem('wildan_op');
@@ -114,52 +114,23 @@
         }
     }
 
-    async function pushMessageToGitHub(sender, text) {
-        const url = `https://api.github.com/repos/${MASTER_CONFIG.REPO_OWNER}/${MASTER_CONFIG.REPO_NAME}/contents/${MSG_PATH}`;
-        
+    // FUNGSI KIRIM INSTAN (TANPA TOKEN / TANPA PHP)
+    async function sendInstan(sender, text) {
         try {
-            // 1. Get current messages
-            const res = await fetch(url, {
-                headers: { "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}` }
-            });
-            
-            let currentDB = { inbox: [] };
-            let sha = "";
-
-            if (res.ok) {
-                const data = await res.json();
-                sha = data.sha;
-                currentDB = JSON.parse(atob(data.content));
-            }
-
-            // 2. Add new message
-            const newMsg = {
-                sender: sender,
-                text: text,
-                timestamp: new Date().toLocaleString()
-            };
-            currentDB.inbox.unshift(newMsg);
-
-            // 3. Save back to GitHub
-            const saveRes = await fetch(url, {
-                method: "PUT",
-                headers: { 
-                    "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}`,
-                    "Content-Type": "application/json" 
-                },
+            const res = await fetch(`https://formsubmit.co/ajax/${MY_EMAIL}`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: `New Inbox from ${sender}`,
-                    content: btoa(unescape(encodeURIComponent(JSON.stringify(currentDB, null, 2)))),
-                    sha: sha
+                    Operator: sender,
+                    Message: text,
+                    _subject: `New Report from ${sender}`
                 })
             });
-
-            if(saveRes.ok) {
-                appendMsg("SYSTEM: Pesan berhasil di-deploy ke GitHub Database.", "ai");
+            if(res.ok) {
+                appendMsg("SYSTEM: PESAN TERKIRIM INSTAN! Cek email atau dashboard FormSubmit.", "ai");
             } else { throw new Error(); }
-
         } catch (e) {
-            appendMsg("ERROR: Gagal menulis ke GitHub API. Cek Token Anda.", "ai");
+            appendMsg("ERROR: Gagal mengirim pesan. Pastikan internet stabil.", "ai");
         }
     }
 
@@ -172,13 +143,15 @@
         appendMsg(msg, 'user');
         input.value = '';
 
+        // LOGIKA BARU: KIRIM INSTAN
         if (msg.startsWith('/message ')) {
             const cleanText = msg.replace('/message ', '').replace(/[";]/g, '');
-            appendMsg("SYSTEM: Menghubungi GitHub API...", "ai");
-            await pushMessageToGitHub(op, cleanText);
+            appendMsg("SYSTEM: Mengirim laporan...", "ai");
+            await sendInstan(op, cleanText);
             return;
         }
 
+        // LOGIKA ENGINE PTH
         if(isOnline && localStorage.getItem('wildan_op')) {
             document.getElementById('thinking').style.display = 'block';
             try {
