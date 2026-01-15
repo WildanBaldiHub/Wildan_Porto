@@ -1,0 +1,19 @@
+{
+  "config": {
+    "engine_active": true,
+    "announcement": "WILDAN Engine V1.0 Online // System Stable",
+    "maintenance_msg": "Maaf, Engine sedang dalam maintenance rutin."
+  },
+  "projects": [
+    {
+      "id": 1,
+      "title": "WILDAN Engine V1.0",
+      "description": "Neural Network model untuk pola pengenalan dinamis.",
+      "theme": "Artificial Intelligence",
+      "genre": "Neural Research",
+      "status": "COMPLETED",
+      "thumbnail": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800",
+      "link": "#"
+    }
+  ]
+}
