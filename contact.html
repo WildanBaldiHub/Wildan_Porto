@@ -138,21 +138,12 @@
     }
 
     async function processChat() {
-        const input = document.getElementById('user-input');
-        const msg = input.value.trim();
-        const op = localStorage.getItem('wildan_op') || "GUEST";
-
-        if(!msg) return;
-        appendMsg(msg, 'user');
-        input.value = '';
-
-        if (msg.startsWith('/message ')) {
-            const cleanText = msg.replace('/message ', '').replace(/[";]/g, '');
-            appendMsg("SYSTEM: Menghubungi Transmisi Dual-Mode...", "ai");
-            await pushDualMode(op, cleanText);
-        }
-    }
-
+        // Ganti link localhost/ngrok jadi link permanen Hugging Face
+const res = await fetch("https://username-spaceanda.hf.space/predict", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: msg, operator: op })
+});
     function appendMsg(t, s) {
         const box = document.getElementById('chat-box');
         const d = document.createElement('div');
