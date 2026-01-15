@@ -9,36 +9,21 @@
         :root { --bg: #020617; --p: #00ff88; --card: #0f172a; --text: #f8fafc; --border: rgba(255,255,255,0.08); }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-
-        /* HEADER - FIXED NAVIGATION */
-        nav { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 75px; 
-            background: rgba(2, 6, 23, 0.98); border-bottom: 1px solid var(--border); 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 40px; z-index: 9999; 
-        }
+        nav { position: fixed; top: 0; left: 0; width: 100%; height: 75px; background: rgba(2, 6, 23, 0.98); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; z-index: 9999; }
         .logo { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: #fff; text-decoration: none; font-size: 1.3rem; }
         .logo span { color: var(--p); }
         .nav-links a { color: #94a3b8; text-decoration: none; margin-left: 20px; font-weight: 600; font-size: 0.8rem; }
-
-        /* MAIN LAYOUT */
         .app-shell { display: grid; grid-template-columns: 350px 1fr; margin-top: 75px; height: calc(100vh - 75px); }
-
-        /* SIDEBAR */
         .sidebar { background: #0a1120; border-right: 1px solid var(--border); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         .auth-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
         .auth-card h4 { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--p); margin-bottom: 12px; }
         input { width: 100%; padding: 10px; margin-bottom: 10px; background: #020617; border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; }
         .btn { width: 100%; padding: 10px; background: var(--p); color: #000; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
-
-        /* CHAT AREA */
         .chat-container { display: flex; flex-direction: column; background: #020617; overflow: hidden; position: relative; }
         .chat-box { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .msg { max-width: 85%; padding: 15px 20px; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; }
         .msg.ai { background: var(--card); border-left: 3px solid var(--p); align-self: flex-start; }
         .msg.user { background: #1e293b; color: #fff; align-self: flex-end; }
-
-        /* INPUT BAR */
         .input-bar { padding: 25px 35px; background: #0a1120; border-top: 1px solid var(--border); display: flex; gap: 12px; position: relative; }
         #user-input { flex: 1; background: #020617; border: 1px solid var(--border); padding: 14px; border-radius: 10px; color: #fff; outline: none; }
         .thinking { position: absolute; top: -22px; left: 35px; font-size: 0.7rem; color: var(--p); font-family: 'JetBrains Mono'; display: none; }
@@ -65,19 +50,13 @@
                 <button class="btn" onclick="login()">INITIALIZE</button>
             </div>
         </div>
-
         <div id="profile-display" style="display:none;">
             <div class="auth-card" style="border-color: var(--p);">
                 <h4>[ OPERATOR_ACTIVE ]</h4>
                 <p id="op-name" style="font-size: 1.2rem; font-weight: 800; margin: 5px 0;"></p>
-                <div style="font-size: 0.6rem; color: #64748b; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
-                    <b>CORE:</b> WILDAN ENGINE V1.0<br>
-                    Weighted Integrated Learning Dynamic Artificial Neuron
-                </div>
                 <button class="btn" style="background: #ff4757; color: white; margin-top: 15px;" onclick="logout()">TERMINATE</button>
             </div>
         </div>
-
         <div class="auth-card" style="margin-top: auto;">
             <h4>// ENGINE_STATUS</h4>
             <p id="engine-status" style="font-size: 0.7rem; color: #ff4757;">● OFFLINE</p>
@@ -86,9 +65,8 @@
 
     <main class="chat-container">
         <div class="chat-box" id="chat-box">
-            <div class="msg ai">Sistem Siap. Menunggu koneksi ke WILDAN Engine (server.py)...</div>
+            <div class="msg ai">Sistem Siap. Gunakan /message "pesan"; untuk melapor ke Admin.</div>
         </div>
-
         <div class="input-bar">
             <div class="thinking" id="thinking">WILDAN ENGINE IS CALCULATING...</div>
             <input type="text" id="user-input" placeholder="Tulis perintah..." onkeypress="if(event.key==='Enter') processChat()">
@@ -98,7 +76,8 @@
 </div>
 
 <script>
-    // --- PERSISTENCE & LOGIN ---
+    let isOnline = false;
+
     window.onload = () => {
         const saved = localStorage.getItem('wildan_op');
         if(saved) {
@@ -121,13 +100,14 @@
         location.reload();
     }
 
-    // --- CONNECT TO .PTH MODEL VIA FLASK ---
     async function checkEngine() {
         try {
             const res = await fetch('http://127.0.0.1:5000/');
+            isOnline = true;
             document.getElementById('engine-status').innerText = "● ONLINE";
             document.getElementById('engine-status').style.color = "var(--p)";
         } catch(e) {
+            isOnline = false;
             document.getElementById('engine-status').innerText = "● OFFLINE (Run server.py)";
         }
     }
@@ -135,27 +115,43 @@
     async function processChat() {
         const input = document.getElementById('user-input');
         const msg = input.value.trim();
-        const op = localStorage.getItem('wildan_op');
+        const op = localStorage.getItem('wildan_op') || "ANONYMOUS";
 
-        if(!msg || !op) return;
-
+        if(!msg) return;
         appendMsg(msg, 'user');
         input.value = '';
-        document.getElementById('thinking').style.display = 'block';
 
-        try {
-            const response = await fetch("http://127.0.0.1:5000/predict", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: msg, operator: op })
-            });
-            const data = await response.json();
-            
+        // LOGIKA KIRIM KE ADMIN
+        if (msg.startsWith('/message ')) {
+            const cleanText = msg.replace('/message ', '').replace(/[";]/g, '');
+            try {
+                await fetch('./api/save_message.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sender: op, text: cleanText })
+                });
+                appendMsg("SYSTEM: Pesan berhasil dikirim ke Admin Panel.", "ai");
+            } catch(e) {
+                appendMsg("ERROR: Gagal terhubung ke API Hosting.", "ai");
+            }
+            return;
+        }
+
+        // LOGIKA ENGINE PTH
+        if(isOnline && localStorage.getItem('wildan_op')) {
+            document.getElementById('thinking').style.display = 'block';
+            try {
+                const res = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: msg, operator: op })
+                });
+                const data = await res.json();
+                appendMsg(data.reply, 'ai');
+            } catch (e) { appendMsg("ERROR: server.py mati.", "ai"); }
             document.getElementById('thinking').style.display = 'none';
-            appendMsg(data.reply, 'ai');
-        } catch (error) {
-            document.getElementById('thinking').style.display = 'none';
-            appendMsg("ERROR: Gagal menghubungi WILDAN Engine. Pastikan server.py menyala.", "ai");
+        } else {
+            appendMsg("SYSTEM: Silahkan login atau gunakan format /message \"text\";", "ai");
         }
     }
 
