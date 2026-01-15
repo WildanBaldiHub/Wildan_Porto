@@ -75,10 +75,10 @@
     </main>
 </div>
 
-
-
+<script src="Admin/config.js"></script>
 <script>
     let isOnline = false;
+    const MSG_PATH = "api/messages.json"; // Path file database pesan
 
     window.onload = () => {
         const saved = localStorage.getItem('wildan_op');
@@ -104,7 +104,6 @@
 
     async function checkEngine() {
         try {
-            // Cek AI Lokal
             const res = await fetch('http://127.0.0.1:5000/');
             isOnline = true;
             document.getElementById('engine-status').innerText = "● ONLINE";
@@ -112,6 +111,55 @@
         } catch(e) {
             isOnline = false;
             document.getElementById('engine-status').innerText = "● OFFLINE (Run server.py)";
+        }
+    }
+
+    async function pushMessageToGitHub(sender, text) {
+        const url = `https://api.github.com/repos/${MASTER_CONFIG.REPO_OWNER}/${MASTER_CONFIG.REPO_NAME}/contents/${MSG_PATH}`;
+        
+        try {
+            // 1. Get current messages
+            const res = await fetch(url, {
+                headers: { "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}` }
+            });
+            
+            let currentDB = { inbox: [] };
+            let sha = "";
+
+            if (res.ok) {
+                const data = await res.json();
+                sha = data.sha;
+                currentDB = JSON.parse(atob(data.content));
+            }
+
+            // 2. Add new message
+            const newMsg = {
+                sender: sender,
+                text: text,
+                timestamp: new Date().toLocaleString()
+            };
+            currentDB.inbox.unshift(newMsg);
+
+            // 3. Save back to GitHub
+            const saveRes = await fetch(url, {
+                method: "PUT",
+                headers: { 
+                    "Authorization": `token ${MASTER_CONFIG.GITHUB_TOKEN}`,
+                    "Content-Type": "application/json" 
+                },
+                body: JSON.stringify({
+                    message: `New Inbox from ${sender}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(currentDB, null, 2)))),
+                    sha: sha
+                })
+            });
+
+            if(saveRes.ok) {
+                appendMsg("SYSTEM: Pesan berhasil di-deploy ke GitHub Database.", "ai");
+            } else { throw new Error(); }
+
+        } catch (e) {
+            appendMsg("ERROR: Gagal menulis ke GitHub API. Cek Token Anda.", "ai");
         }
     }
 
@@ -124,29 +172,13 @@
         appendMsg(msg, 'user');
         input.value = '';
 
-        // --- LOGIKA KIRIM KE ADMIN PANEL (Hosting) ---
         if (msg.startsWith('/message ')) {
             const cleanText = msg.replace('/message ', '').replace(/[";]/g, '');
-            try {
-                // Gunakan URL relatif atau absolut ke file PHP Abang di hosting
-                const response = await fetch('./api/save_message.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sender: op, text: cleanText })
-                });
-                
-                if(res.ok) {
-                    appendMsg("SYSTEM: Pesan berhasil dikirim ke Admin Panel.", "ai");
-                } else {
-                    throw new Error();
-                }
-            } catch(e) {
-                appendMsg("ERROR: Gagal terhubung ke API Hosting. Pastikan save_message.php sudah ada.", "ai");
-            }
+            appendMsg("SYSTEM: Menghubungi GitHub API...", "ai");
+            await pushMessageToGitHub(op, cleanText);
             return;
         }
 
-        // --- LOGIKA ENGINE AI (Lokal) ---
         if(isOnline && localStorage.getItem('wildan_op')) {
             document.getElementById('thinking').style.display = 'block';
             try {
@@ -157,14 +189,10 @@
                 });
                 const data = await res.json();
                 appendMsg(data.reply, 'ai');
-            } catch (e) { 
-                appendMsg("ERROR: server.py mati tiba-tiba.", "ai"); 
-            }
+            } catch (e) { appendMsg("ERROR: server.py mati.", "ai"); }
             document.getElementById('thinking').style.display = 'none';
-        } else if (!localStorage.getItem('wildan_op')) {
-            appendMsg("SYSTEM: Silahkan login operator di sidebar terlebih dahulu.", "ai");
         } else {
-            appendMsg("SYSTEM: Engine offline. Gunakan /message untuk bantuan manual.", "ai");
+            appendMsg("SYSTEM: Silahkan login atau gunakan format /message \"text\";", "ai");
         }
     }
 
