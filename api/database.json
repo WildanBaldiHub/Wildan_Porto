@@ -6,18 +6,6 @@
   },
   "projects": [
     {
-      "id": 1768480344296,
-      "title": "WildanBaldi School",
-      "description": "WildanBaldi School adalah mod Baldi skala besar yang memperluas sekolah asli menjadi pengalaman tanpa akhir yang terus berkembang, penuh dengan berbagai mode, tantangan, minigame, dan sistem tersembunyi.\n\nKemajuan terjadi melalui penemuan, eksperimen, dan pengulangan. Setiap permainan mungkin akan mengatur ulang sekolah, tetapi selalu ada sesuatu yang terbawa.\n\nSemakin lama Anda bermain, semakin sekolah mulai berperilaku berbeda.",
-      "theme": "Games",
-      "genre": "Horror Adventure",
-      "status": "COMPLETED",
-      "thumbnail": "",
-      "link": "#",
-      "created_at": "14 Des 2025",
-      "deployed_at": "15 Jan 2026, 19.32"
-    },
-    {
       "id": 1,
       "title": "WILDAN Engine V1.0",
       "description": "Neural Network model untuk pola pengenalan dinamis.",
