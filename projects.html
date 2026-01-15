@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Archive | Wildan Labs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Sama Persis Dengan Index Agar Konsisten */
+        :root { --bg: #020617; --p: #00ff88; --card: #0f172a; --text: #f8fafc; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); background-image: radial-gradient(circle at 50% 100%, #1e293b 0%, #020617 80%); }
+        .container { max-width: 1200px; margin: auto; padding: 0 25px; }
+        nav { padding: 30px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: #fff; text-decoration: none; font-size: 1.6rem; letter-spacing: -1px; position: relative; }
+        .logo::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 45%; height: 3px; background: #fff; }
+        .cursor { animation: blink 1s infinite; color: var(--p); }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .nav-links a { color: #94a3b8; text-decoration: none; margin-left: 25px; font-weight: 600; font-size: 0.9rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; padding: 80px 0; }
+        .card { background: var(--card); border-radius: 25px; padding: 25px; border: 1px solid rgba(255,255,255,0.05); transition: 0.4s; }
+        .card:hover { border-color: var(--p); transform: translateY(-10px); }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 15px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+<nav class="container">
+    <a href="index.html" class="logo">WILDAN<span style="color:var(--p)">_LABS</span><span class="cursor">.</span></a>
+    <div class="nav-links">
+        <a href="index.html">HOME</a>
+        <a href="projects.html" style="color:var(--p)">ARCHIVE</a>
+        <a href="about.html">ABOUT</a>
+        <a href="contact.html">CONTACT</a>
+    </div>
+</nav>
+
+<main class="container">
+    <header style="padding-top: 80px; text-align: center;">
+        <h1 style="font-size: 4rem; letter-spacing: -3px;">Repository <span>Archive</span>.</h1>
+        <p style="color:#94a3b8;">Daftar lengkap hasil penelitian digital dan pengembangan sistem.</p>
+    </header>
+    <div id="fullGrid" class="grid"></div>
+</main>
+
+<script>
+    async function loadAll() {
+        const res = await fetch('/api/projects');
+        const data = await res.json();
+        document.getElementById('fullGrid').innerHTML = data.map(p => `
+            <div class="card">
+                <img src="${p.thumbnail}">
+                <p style="font-family:'JetBrains Mono'; color:var(--p); font-size:0.7rem;">${p.status.toUpperCase()}</p>
+                <h3 style="margin: 10px 0">${p.title}</h3>
+                <p style="color:#94a3b8; font-size:0.9rem; margin-bottom:20px;">${p.desc_id}</p>
+                <a href="${p.link}" target="_blank" style="color:var(--p); text-decoration:none; font-weight:800;">[ VIEW_PROJECT ]</a>
+            </div>
+        `).join('');
+    }
+    loadAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Labs Admin | Cloud Entry</title>
+    <style>
+        body { font-family: sans-serif; background: #020617; color: white; padding: 40px; }
+        .box { max-width: 600px; margin: auto; background: #0f172a; padding: 30px; border-radius: 20px; border: 1px solid #1e293b; }
+        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 15px; background: #020617; color: white; border: 1px solid #334155; border-radius: 10px; }
+        button { width: 100%; padding: 15px; background: #00ff88; color: #000; border: none; font-weight: 800; cursor: pointer; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h3>🚀 Cloud Entry System</h3>
+        <input type="text" id="t" placeholder="Judul Project">
+        <input type="file" id="f">
+        <input type="text" id="l" placeholder="Link (Github/Itch)">
+        <select id="s"><option value="Completed">Completed</option><option value="Ongoing">Ongoing</option></select>
+        <textarea id="d_id" placeholder="Deskripsi ID"></textarea>
+        <textarea id="d_en" placeholder="Description EN"></textarea>
+        <button onclick="up()">PUBLISH_TO_MYSQL</button>
+    </div>
+    <script>
+        async function up() {
+            const file = document.getElementById('f').files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'wildan_preset');
+
+            // 1. Upload Cloudinary
+            const cRes = await fetch('https://api.cloudinary.com/v1_1/NAMA_CLOUDINARY/image/upload', { method: 'POST', body: formData });
+            const cData = await cRes.json();
+
+            // 2. Simpan MySQL (Vercel API)
+            await fetch('/api/projects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: document.getElementById('t').value,
+                    thumbnail: cData.secure_url,
+                    link: document.getElementById('l').value,
+                    status: document.getElementById('s').value,
+                    desc_id: document.getElementById('d_id').value,
+                    desc_en: document.getElementById('d_en').value
+                })
+            });
+            alert("Success!"); location.reload();
+        }
+    </script>
+</body>
+</html>
