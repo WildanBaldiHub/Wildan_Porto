@@ -6,6 +6,16 @@
   },
   "projects": [
     {
+      "id": 1768546649987,
+      "title": "Cinema Max",
+      "description": "UI/UX Cinema Website, ",
+      "theme": "Project",
+      "status": "COMPLETED",
+      "link": "https://cinema-max-chi.vercel.app/",
+      "thumbnail": "https://img.sanishtech.com/u/e708a68602e815edcb37826c1353b51d.png",
+      "created_at": "16 Jan 2026"
+    },
+    {
       "id": 1768542418039,
       "title": "Normal Kalkulator",
       "description": "Hanyalah kalkulator biasa saja",
