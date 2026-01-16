@@ -28,12 +28,12 @@
     {
       "id": 1,
       "title": "WILDAN Engine V1.0",
-      "description": "Neural Network model untuk pola pengenalan dinamis.",
-      "theme": "Artificial Intelligence",
-      "genre": "Neural Research",
+      "description": "Neural Network model untuk pola pengenalan dinamis.\n\nW.I.L.D.A.N adalah sebuah model kecerdasan buatan (AI) berjenis Small Language Model (SLM) yang dibangun di atas arsitektur Transformer. Model ini dirancang untuk memiliki kemampuan memahami dan menghasilkan teks bahasa manusia secara generatif dengan memanfaatkan data yang diperoleh melalui proses Dynamic Web-Scraping.",
+      "theme": "Project",
       "status": "COMPLETED",
+      "link": "#",
       "thumbnail": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800",
-      "link": "#"
+      "created_at": "16 Jan 2026"
     }
   ]
 }
